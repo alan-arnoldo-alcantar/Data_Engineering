@@ -60,7 +60,9 @@ def message():
 
 @app.post('/login', tags=['auth'])
 def login(user:User):
-    return user
+    if user.email == "admin@gmail.com" and user.password == "admin":
+        token:str = create_token(user.model_dump())
+        return JSONResponse(content=token, status_code=200)
 
 @app.get('/movies', tags=['movies'], response_model=List[Movie])
 def get_movies() -> List[Movie]:
