@@ -6,7 +6,7 @@ from typing import Coroutine, Optional, List
 from jwt_manager import create_token, validate_token
 from fastapi.security import HTTPBearer
 from config.database import session, engine, base
-from models.movie import Movie
+from models.movie import Movie as MovieModel # se cambio para no cinfundir con el esquema de la API
 
 app = FastAPI()
 app.title = "Mi aplicacion con FastAPI"
@@ -95,7 +95,10 @@ def get_movies_by_category(category:str=Query(min_length=2,max_length=15)) -> Li
 
 @app.post('/movies', tags=['movies'], response_model=dict)
 def create_movie(movie: Movie) -> dict:
-    movies.append(movie)
+    db = session() # Se conecta a la base de datos
+    new_movie = MovieModel(**movie.model_dump()) # Crea la instancia(registro)
+    db.add(new_movie) # Agrega el registro a la base de datos
+    db.commit() # Actualiza la base de datos
     return JSONResponse(status_code=201,content={"message":"Se ha registrado la pelicula"})
 
 @app.put('/movies/{id}', tags=['movies'], response_model=dict)
