@@ -5,10 +5,14 @@ from pydantic import BaseModel, Field
 from typing import Coroutine, Optional, List
 from jwt_manager import create_token, validate_token
 from fastapi.security import HTTPBearer
+from config.database import session, engine, base
+from models.movie import Movie
 
 app = FastAPI()
 app.title = "Mi aplicacion con FastAPI"
 app.version = "0.0.1"
+
+base.metadata.create_all(bind=engine) # Crea la base de datos
 
 class JWTBearer(HTTPBearer):
     async def __call__(self, request: Request):
